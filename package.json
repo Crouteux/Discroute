@@ -4,7 +4,7 @@
     "scripts": {
         "build": "tsc",
         "start": "node dist",
-        "test": "ava"
+        "test": "ava --timeout=60s"
     },
     "repository": {
         "type": "git",
