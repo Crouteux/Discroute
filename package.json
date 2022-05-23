@@ -22,6 +22,7 @@
         "@types/sinon": "^10.0.11",
         "ava": "^4.2.0",
         "sinon": "^14.0.0",
+        "ts-node": "^10.8.0",
         "typescript": "^4.6.4"
     },
     "dependencies": {
@@ -29,11 +30,11 @@
         "dotenv": "^16.0.1"
     },
     "ava": {
-        "typescript": {
-            "rewritePaths": {
-                "src/": "dist/"
-            },
-            "compile": false
-        }
+        "extensions": [
+			"ts"
+		],
+		"require": [
+			"ts-node/register"
+		]
     }
 }
