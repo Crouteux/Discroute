@@ -2,6 +2,19 @@
 
 Un bot Discord.
 
+## Démarrage
+
+```sh
+# Installer les dépendances
+npm install
+# Compiler le code source
+npm run build
+# Exécuter les tests unitaires
+npm test
+# Démarrer le bot
+npm start
+```
+
 ## Commandes
 
 Discroute implémente un gestionnaire de commandes minimaliste, créer une commande est relativement simple:
