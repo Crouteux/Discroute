@@ -6,4 +6,9 @@ charset = utf-8
 trim_trailing_whitespace = true
 insert_final_newline = true
 indent_style = space
+
+[*.{ts,json}]
 indent_size = 4
+
+[.yml]
+indent_size = 2
