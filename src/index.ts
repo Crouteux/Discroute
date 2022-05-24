@@ -2,6 +2,7 @@ import chalk from 'chalk';
 import { Client } from 'discord.js';
 import { config } from 'dotenv';
 import { loadCommands } from './command';
+import { loadListeners } from './listener';
 
 config();
 
@@ -33,5 +34,8 @@ client.on('messageCreate', (message) => {
     const [command, ...args] = message.content.slice(1).split(' ');
     commands.find((c) => c.name === command)?.run(message, args, client);
 });
+
+const listeners = loadListeners();
+listeners.forEach((l) => client.on(l.on, l.handler));
 
 client.login(process.env.BOT_TOKEN);
