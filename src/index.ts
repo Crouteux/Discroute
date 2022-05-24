@@ -1,17 +1,11 @@
+import chalk from 'chalk';
 import { Client } from 'discord.js';
 import { config } from 'dotenv';
-import fs from 'fs';
-import path from 'path';
-import { Command } from './command';
+import { loadCommands } from './command';
 
 config();
 
-const commands = fs
-    .readdirSync(path.join(__dirname, 'commands'))
-    .filter((f) => f.endsWith('.js'))
-    .map((f) => require(`./commands/${f}`).default as Command);
-
-commands.forEach((c) => console.log(`Loaded command: ${c.name}`));
+const commands = loadCommands();
 
 const client = new Client({
     intents: [
@@ -31,7 +25,7 @@ const client = new Client({
     },
 });
 
-client.on('ready', () => console.log('Ready!'));
+client.on('ready', () => console.log(chalk.blue('Ready')));
 
 client.on('messageCreate', (message) => {
     if (!message.content.startsWith('!')) return;
