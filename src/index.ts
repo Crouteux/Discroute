@@ -14,6 +14,7 @@ const client = new Client({
         'GUILD_MEMBERS',
         'GUILD_MESSAGES',
         'GUILD_MESSAGE_TYPING',
+        'GUILD_VOICE_STATES',
     ],
     presence: {
         activities: [
