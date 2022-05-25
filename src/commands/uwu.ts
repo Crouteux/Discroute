@@ -4,6 +4,8 @@ const ping: Command = {
     name: 'uwu',
     description: 'uwuify',
     run: (message, args) => {
+        if (args.length === 0) return;
+
         const uwu = args
             .join(' ')
             .replaceAll(/r|l/g, 'w')
