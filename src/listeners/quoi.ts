@@ -1,13 +1,24 @@
 import { Handler } from '../listener';
 
+const answers = {
+    quoi: ['feur'],
+    qui: ['wi', 'gnon'],
+    oui: ['stiti', 'fi'],
+};
+
 const quoi: Handler<'messageCreate'> = {
     on: 'messageCreate',
     handler: (message) => {
-        if (
-            !message.author.bot &&
-            message.content.toLowerCase().endsWith('quoi')
-        )
-            message.channel.send('feur');
+        if (message.author.bot) return;
+
+        Object.keys(answers).forEach((end) => {
+            if (message.content.toLowerCase().endsWith(end)) {
+                const answer = answers[end];
+                message.channel.send(
+                    answer[Math.floor(Math.random() * answer.length)]
+                );
+            }
+        });
     },
 };
 
