@@ -1,7 +1,8 @@
-import { createReadStream, createWriteStream } from 'fs';
+import { createReadStream, createWriteStream, unlinkSync } from 'fs';
 import path from 'path';
 
 import {
+    AudioPlayerStatus,
     createAudioPlayer,
     createAudioResource,
     demuxProbe,
@@ -46,6 +47,8 @@ export const playFile = async (file: string, channel: VoiceBasedChannel) => {
     const connection = voiceConnection(channel);
     const player = createAudioPlayer();
     player.play(resource);
+    player.on(AudioPlayerStatus.Idle, () => unlinkSync(file));
+
     connection.subscribe(player);
 };
 
