@@ -6,6 +6,7 @@ const answers = {
     oui: ['stiti', 'fi'],
     sa: ['lade', 'pristi'],
     moi: ['ssoneur', 'ssoneuse'],
+    bien: ['deux'],
 };
 
 const quoi: Handler<'messageCreate'> = {
@@ -14,7 +15,12 @@ const quoi: Handler<'messageCreate'> = {
         if (message.author.bot) return;
 
         Object.keys(answers).forEach((end) => {
-            if (message.content.toLowerCase().endsWith(end)) {
+            if (
+                message.content
+                    .toLowerCase()
+                    .replace(/[^a-zA-Z]+/g, '')
+                    .endsWith(end)
+            ) {
                 const answer = answers[end];
                 message.channel.send(
                     answer[Math.floor(Math.random() * answer.length)]
