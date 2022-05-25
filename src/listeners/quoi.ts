@@ -4,6 +4,8 @@ const answers = {
     quoi: ['feur'],
     qui: ['wi', 'gnon'],
     oui: ['stiti', 'fi'],
+    sa: ['lade', 'pristi'],
+    moi: ['ssoneur', 'ssoneuse'],
 };
 
 const quoi: Handler<'messageCreate'> = {
