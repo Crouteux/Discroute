@@ -1,8 +1,10 @@
 import { Command } from '../command';
 
 import { playYoutube } from '../lib/player';
+import { readableNumber } from '../lib/util';
 
-import yts from 'yt-search';
+import yts, { SearchResult } from 'yt-search';
+import { MessageEmbed } from 'discord.js';
 
 export const play: Command = {
     name: 'play',
@@ -17,18 +19,32 @@ export const play: Command = {
         if (args.length === 0)
             return message.channel.send('Veuillez entrer une URL');
 
-        let url: string;
+        let res: SearchResult;
         if (
             args[0].startsWith('https://www.youtube.com/watch?v=') ||
             args[0].startsWith('https://youtu.be/')
         )
-            url = args[0];
-        else {
-            const res = await yts(args.join(' '));
-            url = res.videos[0].url;
-        }
+            res = await yts({ query: args.join(' ') });
+        else res = await yts(args.join(' '));
 
-        playYoutube(url, voiceChannel);
+        const video = res.videos[0];
+
+        const embed = new MessageEmbed()
+            .setTitle(video.title)
+            .setURL(video.url)
+            .setImage(video.thumbnail)
+            .setAuthor({
+                name: video.author.name,
+                url: video.author.url,
+            })
+            .setFooter({
+                text: `${readableNumber(video.views)} vues`,
+            });
+
+        message.channel.send({
+            embeds: [embed],
+        });
+        playYoutube(video.url, voiceChannel);
     },
 };
 
