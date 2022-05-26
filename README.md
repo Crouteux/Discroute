@@ -4,6 +4,8 @@ Un bot Discord.
 
 ## Démarrage
 
+Vous pouvez utiliser la version de Node.js que vous préférez, mais la fonctionnalité musique fonctionnera mieux avec la version 14.
+
 ```sh
 # Installer les dépendances
 npm install
