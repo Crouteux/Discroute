@@ -1,8 +1,4 @@
-import { createReadStream, createWriteStream, unlinkSync } from 'fs';
-import path from 'path';
-
 import {
-    AudioPlayerStatus,
     createAudioPlayer,
     createAudioResource,
     demuxProbe,
@@ -13,6 +9,8 @@ import {
 import { VoiceBasedChannel } from 'discord.js';
 
 import ytdl from 'ytdl-core';
+
+import type { Readable } from 'stream';
 
 /**
  * Looks for a voice connection with the given channel, and creates one if it doesn't exist
@@ -36,18 +34,20 @@ export const voiceConnection = (
 };
 
 /**
- * Plays a song from a given file path
+ * Plays a song from a given stream
  *
- * @param {string} file The path to the file
+ * @param {Readable} readable The readable stream of the song
  * @param {VoiceBasedChannel} channel The voice channel to play the file in
  */
-export const playFile = async (file: string, channel: VoiceBasedChannel) => {
-    const { stream, type } = await demuxProbe(createReadStream(file));
+export const playStream = async (
+    readable: Readable,
+    channel: VoiceBasedChannel
+) => {
+    const { stream, type } = await demuxProbe(readable);
     const resource = createAudioResource(stream, { inputType: type });
     const connection = voiceConnection(channel);
     const player = createAudioPlayer();
     player.play(resource);
-    player.on(AudioPlayerStatus.Idle, () => unlinkSync(file));
 
     connection.subscribe(player);
 };
@@ -59,14 +59,11 @@ export const playFile = async (file: string, channel: VoiceBasedChannel) => {
  * @param {VoiceBasedChannel} channel The voice channel to play the song in
  */
 export const playYoutube = (url: string, channel: VoiceBasedChannel) => {
-    const dir = path.join(process.cwd(), 'audio', channel.guild.id);
-
-    ytdl(url, {
-        quality: 'highestaudio',
-        filter: 'audioonly',
-    })
-        .pipe(createWriteStream(dir))
-        .on('finish', async () => {
-            await playFile(dir, channel);
-        });
+    playStream(
+        ytdl(url, {
+            quality: 'highestaudio',
+            filter: 'audioonly',
+        }),
+        channel
+    );
 };
