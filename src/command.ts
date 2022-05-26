@@ -19,7 +19,11 @@ export type Command = {
 export const loadCommands = () =>
     fs
         .readdirSync(path.join(__dirname, 'commands'))
-        .filter((f) => f.endsWith('.js'))
+        .filter(
+            (f) =>
+                (!f.endsWith('.spec.ts') && f.endsWith('.ts')) ||
+                f.endsWith('.js')
+        )
         .map((f) => {
             const cmd = require(`./commands/${f}`).default as Command;
             console.log(chalk.green('CMD ') + cmd.name);
