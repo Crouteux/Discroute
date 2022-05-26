@@ -1,6 +1,6 @@
 import { Command } from '../command';
 
-import { playYoutube } from '../lib/player';
+import { playYoutube, queues } from '../lib/player';
 import { readableNumber } from '../lib/util';
 
 import yts, { SearchResult } from 'yt-search';
@@ -29,8 +29,15 @@ export const play: Command = {
 
         const video = res.videos[0];
 
+        const queue = queues.get(message.guild.id);
+
         const embed = new MessageEmbed()
             .setTitle(video.title)
+            .setDescription(
+                queue
+                    ? `Ajouté à la queue (#${queue.songs.length})`
+                    : 'Lecture en cours'
+            )
             .setURL(video.url)
             .setImage(video.thumbnail)
             .setAuthor({

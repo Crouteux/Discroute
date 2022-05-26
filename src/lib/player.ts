@@ -1,4 +1,7 @@
 import {
+    AudioPlayer,
+    AudioPlayerStatus,
+    AudioResource,
     createAudioPlayer,
     createAudioResource,
     demuxProbe,
@@ -11,6 +14,39 @@ import { VoiceBasedChannel } from 'discord.js';
 import ytdl from 'ytdl-core';
 
 import type { Readable } from 'stream';
+
+class Queue {
+    public readonly player: AudioPlayer;
+    public readonly songs: AudioResource[];
+
+    constructor(
+        current: AudioResource,
+        public readonly channel: VoiceBasedChannel
+    ) {
+        this.songs = [current];
+
+        this.player = createAudioPlayer();
+        this.player.play(current);
+        this.player.on(AudioPlayerStatus.Idle, () => this.skip());
+        voiceConnection(channel).subscribe(this.player);
+    }
+
+    public add(song: AudioResource) {
+        this.songs.push(song);
+    }
+
+    public async skip() {
+        this.songs.shift();
+        if (this.songs.length) {
+            this.player.play(this.songs[0]);
+        } else {
+            this.player.stop();
+            queues.delete(this.channel.guild.id);
+        }
+    }
+}
+
+export const queues: Map<string, Queue> = new Map();
 
 /**
  * Looks for a voice connection with the given channel, and creates one if it doesn't exist
@@ -33,6 +69,13 @@ export const voiceConnection = (
     return connection;
 };
 
+export const createStreamResource = async (
+    readable: Readable
+): Promise<AudioResource> => {
+    const { stream, type } = await demuxProbe(readable);
+    return createAudioResource(stream, { inputType: type });
+};
+
 /**
  * Plays a song from a given stream
  *
@@ -43,13 +86,14 @@ export const playStream = async (
     readable: Readable,
     channel: VoiceBasedChannel
 ) => {
-    const { stream, type } = await demuxProbe(readable);
-    const resource = createAudioResource(stream, { inputType: type });
-    const connection = voiceConnection(channel);
-    const player = createAudioPlayer();
-    player.play(resource);
-
-    connection.subscribe(player);
+    const resource = await createStreamResource(readable);
+    let queue = queues.get(channel.guild.id);
+    if (queue) {
+        queue.add(resource);
+    } else {
+        queue = new Queue(resource, channel);
+        queues.set(channel.guild.id, queue);
+    }
 };
 
 /**
